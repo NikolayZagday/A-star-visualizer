@@ -5,8 +5,209 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:a_star"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
+        Title="A* visualizer" Height="607" Width="700">
+    <Grid Background="{StaticResource BGdarkestBrush}" Name="LayoutRoot">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="2"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Border Padding="3" Grid.Row="0" Grid.ColumnSpan="2">
+            <WrapPanel>
+                <TextBlock 
+                    Margin="3"
+                    VerticalAlignment="Center" 
+                    Foreground="{StaticResource ForegroundLightBrush}" 
+                    Text="Nodes:">
+                </TextBlock>
+
+                <TextBox 
+                    Background="{StaticResource BGdarkestBrush}"
+                    FontSize="{StaticResource fontSizeNormal}"
+                    Style="{StaticResource EditableTextBlock}"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Name="xNodeSizeTB" 
+                    Text="{Binding XaxisNodeNumber, FallbackValue=50}">
+                </TextBox>
+
+                <TextBlock Foreground="{StaticResource ForegroundLightBrush}" Text=" x " VerticalAlignment="Center"></TextBlock>
+
+                <TextBox
+                    Background="{StaticResource BGdarkestBrush}"
+                    FontSize="{StaticResource fontSizeNormal}"
+                    Style="{StaticResource EditableTextBlock}"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Name="yNodeSizeTB" 
+                    Text="{Binding YaxisNodeNumber, FallbackValue=50}">
+                </TextBox>
+
+                <Button 
+                    Name="Reset" 
+                    Content="Reset"
+                    Margin="1 0 1 0"
+                    Height="25"
+                    Click="Reset_Click"
+                    Style="{StaticResource MenuButton}">
+                </Button>
+
+                <Button 
+                    Name="pickStartNode" 
+                    Content="Pick start node" 
+                    Margin="1 0 1 0"
+                    Click="PickStartNode_Click"
+                    Height="25"
+                    Style="{StaticResource MenuButton}">
+                </Button>
+
+                <Button 
+                    Name="pickEndNode" 
+                    Content="Pick end node" 
+                    Margin="1 0 1 0"
+                    Height="25"
+                    Click="PickEndNode_Click"
+                    Style="{StaticResource MenuButton}">
+                </Button>
+
+                <Button 
+                    Name="DrawWall" 
+                    Content="Draw wall"
+                    Margin="1 0 1 0"
+                    Height="25"
+                    Click="DrawWall_Click"
+                    Style="{StaticResource MenuButton}">
+                </Button>
+
+                <Button 
+                    Name="RemoveWall" 
+                    Content="Remove Wall"
+                    Margin="1 0 1 0"
+                    Height="25"
+                    Click="RemoveWall_Click"
+                    Style="{StaticResource MenuButton}">
+                </Button>
+
+                <Border>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock 
+                            Margin="3"
+                            VerticalAlignment="Center" 
+                            Foreground="{StaticResource ForegroundLightBrush}" 
+                            Text="Heuristics:">
+                        </TextBlock>
+
+                        <ComboBox
+                            Style="{StaticResource MinimalCombobox}"
+                            SelectedItem="{Binding SearchHeuristics, 
+                                Converter={local:EnumDescriptionConverter}}"
+                            ItemsSource="{Binding 
+                                Converter={local:EnumDescriptionSource},
+                                ConverterParameter={x:Type local:Heuristics}}" 
+                            Margin="5">
+                        </ComboBox>
+                    </StackPanel>
+                </Border>
+
+                <Button 
+                    Name="SearchPath" 
+                    Content="Search Path"
+                    Margin="1 0 1 0"
+                    Height="25"
+                    Click="SearchPath_Click"
+                    Background="DarkSeaGreen"
+                    Style="{StaticResource MenuButton}">
+                </Button>
+
+                <CheckBox
+                    Content="Animation" 
+                    VerticalAlignment="Center"
+                    Foreground="{StaticResource ForegroundLightBrush}"
+                    Margin="3" IsChecked="{Binding Delay}">
+                </CheckBox>
+
+                <CheckBox
+                    Content="Show previous path" 
+                    VerticalAlignment="Center"
+                    Foreground="{StaticResource ForegroundLightBrush}"
+                    Margin="3" IsChecked="{Binding ShowPreviousPath}">
+                </CheckBox>
+
+                <CheckBox 
+                    Content="Diagonal search" 
+                    VerticalAlignment="Center" 
+                    Foreground="{StaticResource ForegroundLightBrush}"
+                    Margin="3" 
+                    IsChecked="{Binding DiagonalSearch}" >
+                </CheckBox>
+
+            </WrapPanel>
+        </Border>
+
+        <Border 
+            Name="imageWrapper" 
+            SizeChanged="ImgControl_SizeChanged"
+            Grid.Row="1">
+            <Image Name="imgControl"/>
+        </Border>
+
+        <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Height="2" Background="Black"></StackPanel>
+
+        <StackPanel Margin="5 5 0 0" Orientation="Horizontal" Grid.ColumnSpan="2" Grid.Row="3">
+            <TextBlock 
+                Margin="3"
+                VerticalAlignment="Center" 
+                Foreground="{StaticResource ForegroundLightBrush}" 
+                Text="{Binding State, StringFormat={}State:{0}, FallbackValue=State:SomeState}">
+            </TextBlock>
+            <TextBlock
+                Margin="3"
+                VerticalAlignment="Center" 
+                Foreground="{StaticResource ForegroundLightBrush}" 
+                Text="{Binding MainLoops, StringFormat={}Main Loops:{0}, FallbackValue=Main Loops:100}">
+            </TextBlock>
+            <TextBlock 
+                Margin="3"
+                VerticalAlignment="Center" 
+                Foreground="{StaticResource ForegroundLightBrush}" 
+                Text="{Binding NodesScaned, StringFormat={}Nodes Scaned:{0}, FallbackValue=Nodes Scaned:100}">
+            </TextBlock>
+            <TextBlock 
+                Margin="3"
+                VerticalAlignment="Center" 
+                Foreground="{StaticResource ForegroundLightBrush}" 
+                Text="{Binding StartNodeX, StringFormat={}Start node X:{0}}">
+            </TextBlock>
+            <TextBlock 
+                Margin="3"
+                VerticalAlignment="Center" 
+                Foreground="{StaticResource ForegroundLightBrush}" 
+                Text="{Binding StartNodeY, StringFormat={}Start node Y:{0}}">
+            </TextBlock>
+
+            <TextBlock 
+                Margin="3"
+                VerticalAlignment="Center" 
+                Foreground="{StaticResource ForegroundLightBrush}" 
+                Text="{Binding GoalNodeX, StringFormat={}Goal node X:{0}}">
+            </TextBlock>
+            <TextBlock 
+                Margin="3"
+                VerticalAlignment="Center" 
+                Foreground="{StaticResource ForegroundLightBrush}" 
+                Text="{Binding GoalNodeY, StringFormat={}Goal node Y:{0}}">
+            </TextBlock>
+        </StackPanel>
+
+        <StackPanel Margin="5 5 0 0" Grid.Row="3" Grid.Column="1">
+
+        </StackPanel>
     </Grid>
 </Window>
